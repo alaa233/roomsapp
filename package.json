@@ -15,6 +15,8 @@
     "build:mobile": "vite build --config vite.mobile.config.js",
     "cap:sync": "npx cap sync && node scripts/merge-ios-package-classes.mjs",
     "build:mobile:sync": "npm run build:mobile && npm run cap:sync",
+    "android:apk": "npm run build:mobile:sync && cd mobile/android && ./gradlew assembleDebug",
+    "android:apk:release": "npm run build:mobile:sync && cd mobile/android && ./gradlew assembleRelease",
     "build:api": "cd backend && npm run build",
     "build": "npm run build:web && npm run build:api",
     "start": "cd backend && npm run start:prod",

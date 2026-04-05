@@ -59,6 +59,7 @@ Then open [http://localhost:3000/parent.html](http://localhost:3000/parent.html)
 ## Mobile (Capacitor — child app)
 
 - Build web assets and sync native projects: `npm run build:mobile:sync`
+- **Android APK (debug):** `npm run android:apk` — needs JDK 17+ and Android SDK; APK at `mobile/android/app/build/outputs/apk/debug/app-debug.apk`
 - MDM, signing, and `VITE_SERVER_URL` / managed `serverUrl`: see [ADMIN_MOBILE.md](ADMIN_MOBILE.md)
 
 ## Web browser (child page)

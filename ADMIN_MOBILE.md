@@ -43,6 +43,28 @@ Before WebRTC starts, the child UI calls [`ensureStreamingPermissions()`](src/ap
 - **Permissions:** `CAMERA`, `RECORD_AUDIO`, `FOREGROUND_SERVICE_*`, `POST_NOTIFICATIONS` are declared in [`AndroidManifest.xml`](mobile/android/app/src/main/AndroidManifest.xml).
 - **Build:** Open `mobile/android` in Android Studio, install SDK/JDK, then build a release or debug APK/AAB. Distribute via **Managed Google Play** for Android Enterprise.
 
+### Build an APK from the terminal
+
+Prerequisites: **JDK 17+** (e.g. Temurin or Android Studio’s bundled JBR) and **Android SDK** (via Android Studio or `ANDROID_HOME`). From the repo root:
+
+```bash
+npm run android:apk
+```
+
+This runs `build:mobile:sync`, then `./gradlew assembleDebug`. Output:
+
+- **Debug APK:** `mobile/android/app/build/outputs/apk/debug/app-debug.apk`
+
+Unsigned **release** APK (for local testing; Play Store needs a signed AAB/APK):
+
+```bash
+npm run android:apk:release
+```
+
+Output: `mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk` (sign with your keystore for distribution).
+
+Install a debug build on a device with USB debugging: `adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk`.
+
 ## iOS
 
 - **Privacy strings:** [`Info.plist`](mobile/ios/App/App/Info.plist) includes `NSCameraUsageDescription` and `NSMicrophoneUsageDescription`.
