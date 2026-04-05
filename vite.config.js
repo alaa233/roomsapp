@@ -6,6 +6,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   build: {
+    outDir: 'backend/public',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         child: resolve(__dirname, 'child.html'),
@@ -16,7 +18,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/ws': {
-        target: 'ws://127.0.0.1:8080',
+        target: 'ws://127.0.0.1:3000',
         ws: true,
         changeOrigin: true,
       },

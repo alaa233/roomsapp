@@ -3,3 +3,7 @@ dist
 .DS_Store
 .env
 .env.local
+
+# Vite build output (served by Nest from backend/public)
+backend/public/**
+!backend/public/.gitkeep

@@ -142,3 +142,38 @@ button:disabled {
 .preview.remote {
   aspect-ratio: 16 / 9;
 }
+
+.remote-controls {
+  margin-bottom: 0.75rem;
+}
+
+.remote-controls.hidden {
+  display: none;
+}
+
+.remote-controls__label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.remote-controls__row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.remote-controls__row button {
+  flex: 1;
+  min-width: 8rem;
+  background: #2d5a87;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.remote-controls__row button:disabled {
+  opacity: 0.45;
+}

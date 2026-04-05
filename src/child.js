@@ -101,6 +101,17 @@ function onSignalMessage(msg) {
   }
   if (msg.type === 'ice' && msg.candidate && pc && iceQueue) {
     iceQueue.add(new RTCIceCandidate(msg.candidate));
+    return;
+  }
+  if (msg.type === 'child-audio' && localStream) {
+    const track = localStream.getAudioTracks()[0];
+    if (track) track.enabled = !!msg.enabled;
+    return;
+  }
+  if (msg.type === 'child-video' && localStream) {
+    const track = localStream.getVideoTracks()[0];
+    if (track) track.enabled = !!msg.enabled;
+    return;
   }
 }
 

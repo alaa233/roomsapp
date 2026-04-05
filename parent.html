@@ -19,6 +19,13 @@
         <button id="btnDisconnect" type="button" disabled>Disconnect</button>
       </div>
       <p id="status" class="status" role="status"></p>
+      <div id="remoteControls" class="remote-controls hidden" aria-label="Child device media">
+        <span class="remote-controls__label">Child device</span>
+        <div class="remote-controls__row">
+          <button id="btnChildMic" type="button" disabled>Microphone on</button>
+          <button id="btnChildCam" type="button" disabled>Camera on</button>
+        </div>
+      </div>
       <video id="remoteVideo" class="preview remote" playsinline autoplay></video>
     </main>
     <script type="module" src="/src/parent.js"></script>

@@ -9,13 +9,40 @@ const btnConnect = document.getElementById('btnConnect');
 const btnDisconnect = document.getElementById('btnDisconnect');
 const statusEl = document.getElementById('status');
 const remoteVideo = document.getElementById('remoteVideo');
+const remoteControls = document.getElementById('remoteControls');
+const btnChildMic = document.getElementById('btnChildMic');
+const btnChildCam = document.getElementById('btnChildCam');
 
 let ws = null;
 let pc = null;
 let iceQueue = null;
+let childMicOn = true;
+let childCamOn = true;
 
 function setStatus(text) {
   statusEl.textContent = text;
+}
+
+function setRemoteMediaControlsVisible(show) {
+  if (remoteControls) remoteControls.classList.toggle('hidden', !show);
+}
+
+function updateChildMediaButtons() {
+  if (btnChildMic) {
+    btnChildMic.textContent = childMicOn
+      ? 'Turn off child mic'
+      : 'Turn on child mic';
+  }
+  if (btnChildCam) {
+    btnChildCam.textContent = childCamOn
+      ? 'Turn off child cam'
+      : 'Turn on child cam';
+  }
+}
+
+function setChildMediaButtonsEnabled(enabled) {
+  if (btnChildMic) btnChildMic.disabled = !enabled;
+  if (btnChildCam) btnChildCam.disabled = !enabled;
 }
 
 function cleanup() {
@@ -35,6 +62,11 @@ function cleanup() {
   }
   btnConnect.disabled = false;
   btnDisconnect.disabled = true;
+  childMicOn = true;
+  childCamOn = true;
+  updateChildMediaButtons();
+  setChildMediaButtonsEnabled(false);
+  setRemoteMediaControlsVisible(false);
 }
 
 function send(msg) {
@@ -113,6 +145,11 @@ btnConnect.addEventListener('click', () => {
     send({ type: 'join', roomId });
     setStatus('Joined room. Waiting for child stream…');
     btnDisconnect.disabled = false;
+    childMicOn = true;
+    childCamOn = true;
+    updateChildMediaButtons();
+    setChildMediaButtonsEnabled(true);
+    setRemoteMediaControlsVisible(true);
   };
 
   ws.onmessage = (ev) => {
@@ -136,4 +173,16 @@ btnConnect.addEventListener('click', () => {
 btnDisconnect.addEventListener('click', () => {
   setStatus('Disconnected.');
   cleanup();
+});
+
+btnChildMic?.addEventListener('click', () => {
+  childMicOn = !childMicOn;
+  updateChildMediaButtons();
+  send({ type: 'child-audio', enabled: childMicOn });
+});
+
+btnChildCam?.addEventListener('click', () => {
+  childCamOn = !childCamOn;
+  updateChildMediaButtons();
+  send({ type: 'child-video', enabled: childCamOn });
 });

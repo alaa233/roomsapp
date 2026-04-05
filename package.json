@@ -3,18 +3,22 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "vite",
-    "signal": "node server/signaling.mjs",
-    "dev:all": "concurrently -k \"npm run signal\" \"npm run dev\"",
-    "build": "vite build",
+    "dev": "concurrently -k \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:web": "vite",
+    "dev:api": "cd backend && npm run start:dev",
+    "build:web": "vite build",
+    "build:api": "cd backend && npm run build",
+    "build": "npm run build:web && npm run build:api",
+    "start": "cd backend && npm run start:prod",
     "preview": "vite preview"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "vite": "^6.2.0"
   },
-  "dependencies": {
-    "ws": "^8.18.0"
-  }
+  "dependencies": {}
 }
