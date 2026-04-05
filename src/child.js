@@ -8,6 +8,13 @@ import {
   releaseScreenWakeLock,
   wsUrl,
 } from './webrtc-helpers.js';
+import { initAppConfig } from './server-config.js';
+import {
+  startStreamingForegroundService,
+  stopStreamingForegroundService,
+} from './native-streaming.js';
+
+await initAppConfig();
 
 const roomInput = document.getElementById('roomId');
 const btnStart = document.getElementById('btnStart');
@@ -46,6 +53,7 @@ function cleanup() {
   btnStart.disabled = false;
   btnStop.disabled = true;
   releaseScreenWakeLock();
+  void stopStreamingForegroundService();
 }
 
 function send(msg) {
@@ -101,6 +109,7 @@ function connectWebSocket(roomId) {
     send({ type: 'join', roomId });
     setStatus('Joined room. Waiting for parent…');
     btnStop.disabled = false;
+    void startStreamingForegroundService();
   };
 
   ws.onmessage = (ev) => {

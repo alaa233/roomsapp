@@ -9,16 +9,25 @@
   "scripts": {
     "dev": "concurrently -k \"npm run dev:api\" \"npm run dev:web\"",
     "dev:web": "vite",
+    "dev:mobile": "vite --config vite.mobile.config.js",
     "dev:api": "cd backend && npm run start:dev",
     "build:web": "vite build",
+    "build:mobile": "vite build --config vite.mobile.config.js",
+    "cap:sync": "npx cap sync && node scripts/merge-ios-package-classes.mjs",
+    "build:mobile:sync": "npm run build:mobile && npm run cap:sync",
     "build:api": "cd backend && npm run build",
     "build": "npm run build:web && npm run build:api",
     "start": "cd backend && npm run start:prod",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.3.0",
     "concurrently": "^9.1.2",
     "vite": "^6.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0"
+  }
 }

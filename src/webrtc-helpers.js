@@ -105,7 +105,19 @@ export function createIceCandidateQueue(pc) {
   };
 }
 
+/**
+ * WebSocket URL for signaling. On Capacitor, set `window.__SIGNALING_SERVER_BASE__`
+ * (e.g. `https://your-api.example.com`) via `initAppConfig()` / MDM — `location` would
+ * otherwise point at the bundled origin and break WSS.
+ */
 export function wsUrl() {
+  const base =
+    typeof window !== 'undefined' && window.__SIGNALING_SERVER_BASE__;
+  if (base) {
+    const u = new URL(base);
+    const proto = u.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${proto}//${u.host}/ws`;
+  }
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${proto}//${location.host}/ws`;
 }

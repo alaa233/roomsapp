@@ -1,0 +1,17 @@
+{
+  "appId": "com.webrtcchildmonitor.child",
+  "appName": "Child Monitor",
+  "webDir": "mobile/www",
+  "android": {
+    "path": "mobile/android"
+  },
+  "ios": {
+    "path": "mobile/ios"
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "packageClassList": [
+    "CapApp_SPM.MdmConfigPlugin"
+  ]
+}

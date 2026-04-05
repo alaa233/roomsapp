@@ -56,6 +56,11 @@ npm run build && npm start
 
 Then open [http://localhost:3000/parent.html](http://localhost:3000/parent.html) (Render sets `PORT` automatically in production).
 
+## Mobile (Capacitor — child app)
+
+- Build web assets and sync native projects: `npm run build:mobile:sync`
+- MDM, signing, and `VITE_SERVER_URL` / managed `serverUrl`: see [ADMIN_MOBILE.md](ADMIN_MOBILE.md)
+
 ## STUN and TURN
 
 - **STUN** is enabled in [`src/webrtc-helpers.js`](src/webrtc-helpers.js).
@@ -67,3 +72,4 @@ Then open [http://localhost:3000/parent.html](http://localhost:3000/parent.html)
 |----------------|--------------|----------------------------|
 | `PORT`         | Nest (backend) | HTTP + WebSocket port  |
 | `VITE_TURN_*`  | Vite build   | Optional TURN ICE servers  |
+| `VITE_SERVER_URL` | Vite build (mobile) | HTTPS origin of Nest app for Capacitor WebSocket (`wss://…/ws`); optional if MDM sets `serverUrl` at runtime |

@@ -6,6 +6,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   build: {
+    target: 'es2022',
     outDir: 'backend/public',
     emptyOutDir: true,
     rollupOptions: {

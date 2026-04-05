@@ -7,3 +7,7 @@ dist
 # Vite build output (served by Nest from backend/public)
 backend/public/**
 !backend/public/.gitkeep
+
+# Capacitor web bundle
+mobile/www/**
+!mobile/www/.gitkeep

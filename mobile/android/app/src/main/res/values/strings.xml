@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Child Monitor</string>
+    <string name="title_activity_main">Child Monitor</string>
+    <string name="package_name">com.webrtcchildmonitor.child</string>
+    <string name="custom_url_scheme">com.webrtcchildmonitor.child</string>
+    <string name="streaming_notification_channel_name">Streaming</string>
+    <string name="streaming_notification_channel_desc">Shown while camera and microphone are active for WebRTC</string>
+    <string name="streaming_notification_title_default">Camera and microphone active</string>
+    <string name="streaming_notification_body_default">Streaming to parent. Tap to return to the app.</string>
+</resources>
