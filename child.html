@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Child — share camera &amp; mic</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body class="page page--child">
+    <main class="panel">
+      <h1>Child device</h1>
+      <p class="hint">Enter the same room ID as the parent, then start. Allow camera and microphone when prompted.</p>
+      <label class="field">
+        <span>Room ID</span>
+        <input id="roomId" type="text" autocomplete="off" placeholder="e.g. family-kitchen" />
+      </label>
+      <div class="actions">
+        <button id="btnStart" type="button">Start sharing</button>
+        <button id="btnStop" type="button" disabled>Stop</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+      <video id="localPreview" class="preview" playsinline muted autoplay></video>
+    </main>
+    <script type="module" src="/src/child.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "webrtc-child-monitor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "signal": "node server/signaling.mjs",
+    "dev:all": "concurrently -k \"npm run signal\" \"npm run dev\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
