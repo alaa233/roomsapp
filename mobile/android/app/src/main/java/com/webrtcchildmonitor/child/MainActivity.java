@@ -9,6 +9,7 @@ public class MainActivity extends BridgeActivity {
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(MdmConfigPlugin.class);
     registerPlugin(StreamingForegroundPlugin.class);
+    registerPlugin(AppPermissionsPlugin.class);
     super.onCreate(savedInstanceState);
   }
 }

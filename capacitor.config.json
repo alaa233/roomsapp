@@ -12,6 +12,7 @@
     "androidScheme": "https"
   },
   "packageClassList": [
-    "CapApp_SPM.MdmConfigPlugin"
+    "CapApp_SPM.MdmConfigPlugin",
+    "CapApp_SPM.AppPermissionsPlugin"
   ]
 }

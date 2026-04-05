@@ -13,12 +13,17 @@ import {
   startStreamingForegroundService,
   stopStreamingForegroundService,
 } from './native-streaming.js';
+import {
+  ensureStreamingPermissions,
+  openAppSettingsNative,
+} from './app-permissions.js';
 
 await initAppConfig();
 
 const roomInput = document.getElementById('roomId');
 const btnStart = document.getElementById('btnStart');
 const btnStop = document.getElementById('btnStop');
+const btnOpenSettings = document.getElementById('btnOpenSettings');
 const statusEl = document.getElementById('status');
 const localPreview = document.getElementById('localPreview');
 
@@ -52,6 +57,7 @@ function cleanup() {
   }
   btnStart.disabled = false;
   btnStop.disabled = true;
+  if (btnOpenSettings) btnOpenSettings.classList.add('hidden');
   releaseScreenWakeLock();
   void stopStreamingForegroundService();
 }
@@ -168,31 +174,42 @@ function onSignalMessage(msg) {
 }
 
 btnStart.addEventListener('click', () => {
-  const roomId = roomInput.value.trim();
-  if (!roomId) {
-    setStatus('Enter a room ID.');
-    return;
-  }
+  void (async () => {
+    const roomId = roomInput.value.trim();
+    if (!roomId) {
+      setStatus('Enter a room ID.');
+      return;
+    }
 
-  if (!isMediaSecureContext()) {
-    setStatus(
-      'This page is not secure (often http:// on a phone or LAN IP). Open the app with HTTPS so Safari exposes the camera and microphone.',
-    );
-    return;
-  }
+    if (!isMediaSecureContext()) {
+      setStatus(
+        'This page is not secure (often http:// on a phone or LAN IP). Open the app with HTTPS so Safari exposes the camera and microphone.',
+      );
+      return;
+    }
 
-  if (!canAccessUserMedia()) {
-    setStatus(
-      'No camera/microphone API in this browser. Use Safari or Chrome directly, or enable HTTPS.',
-    );
-    return;
-  }
+    if (!canAccessUserMedia()) {
+      setStatus(
+        'No camera/microphone API in this browser. Use Safari or Chrome directly, or enable HTTPS.',
+      );
+      return;
+    }
 
-  btnStart.disabled = true;
-  setStatus('Requesting camera and microphone…');
-  void acquireScreenWakeLock();
+    const perm = await ensureStreamingPermissions();
+    if (!perm.ok) {
+      setStatus(
+        'Camera and microphone (and notifications on Android 13+) are required. Tap Open Settings if you denied them before.',
+      );
+      if (btnOpenSettings) btnOpenSettings.classList.remove('hidden');
+      return;
+    }
+    if (btnOpenSettings) btnOpenSettings.classList.add('hidden');
 
-  getUserMediaCompat({ video: true, audio: true })
+    btnStart.disabled = true;
+    setStatus('Requesting camera and microphone…');
+    void acquireScreenWakeLock();
+
+    getUserMediaCompat({ video: true, audio: true })
     .then((stream) => {
       localStream = stream;
       localPreview.srcObject = stream;
@@ -206,7 +223,14 @@ btnStart.addEventListener('click', () => {
       setStatus(formatGetUserMediaError(e));
       btnStart.disabled = false;
     });
+  })();
 });
+
+if (btnOpenSettings) {
+  btnOpenSettings.addEventListener('click', () => {
+    void openAppSettingsNative();
+  });
+}
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible' || !localStream) return;

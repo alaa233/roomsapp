@@ -15,7 +15,7 @@ npm install
 npm run build:mobile:sync
 ```
 
-This runs `vite build` with [`vite.mobile.config.js`](vite.mobile.config.js) (output: [`mobile/www`](mobile/www)), then `npx cap sync`, then [`scripts/merge-ios-package-classes.mjs`](scripts/merge-ios-package-classes.mjs) so the iOS bundle’s `packageClassList` includes the local **`MdmConfigPlugin`** (Capacitor’s CLI otherwise only auto-detects plugins from npm packages).
+This runs `vite build` with [`vite.mobile.config.js`](vite.mobile.config.js) (output: [`mobile/www`](mobile/www)), then `npx cap sync`, then [`scripts/merge-ios-package-classes.mjs`](scripts/merge-ios-package-classes.mjs) so the iOS bundle’s `packageClassList` includes local SPM plugins such as **`MdmConfigPlugin`** and **`AppPermissionsPlugin`** (Capacitor’s CLI otherwise only auto-detects plugins from npm packages).
 
 ## Signaling server URL (required on real devices)
 
@@ -27,6 +27,15 @@ The WebView origin is **not** your API host, so WebSocket URLs must be set expli
    - **iOS:** Managed App Configuration dictionary key **`serverUrl`**. Implemented in [`MdmConfigPlugin.swift`](mobile/ios/App/CapApp-SPM/Sources/CapApp-SPM/MdmConfigPlugin.swift) via `UserDefaults` key `com.apple.configuration.managed`.
 
 Native plugins are registered from JS in [`src/server-config.js`](src/server-config.js); [`src/webrtc-helpers.js`](src/webrtc-helpers.js) builds `wss://…/ws` from `window.__SIGNALING_SERVER_BASE__`.
+
+## Runtime permissions (in-app)
+
+Before WebRTC starts, the child UI calls [`ensureStreamingPermissions()`](src/app-permissions.js), which uses the native **`AppPermissions`** plugin:
+
+- **Android:** Runtime `CAMERA`, `RECORD_AUDIO`, and on **API 33+** `POST_NOTIFICATIONS` (so the foreground-service notification can appear). Status strings match Capacitor’s permission states (`granted`, `denied`, `prompt`, `prompt-with-rationale`). If the user has denied access, the **Open Settings** button opens the app’s system settings ([`AppPermissionsPlugin.java`](mobile/android/app/src/main/java/com/webrtcchildmonitor/child/AppPermissionsPlugin.java)).
+- **iOS:** `AVCaptureDevice` authorization for video and audio; `notifications` is reported as `notApplicable`. **Open Settings** uses the app settings URL ([`AppPermissionsPlugin.swift`](mobile/ios/App/CapApp-SPM/Sources/CapApp-SPM/AppPermissionsPlugin.swift)).
+
+**MDM cannot replace** user grants for camera/microphone: devices still show system prompts on first use (or after reset). Plan onboarding accordingly.
 
 ## Android
 
