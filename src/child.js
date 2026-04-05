@@ -1,11 +1,14 @@
 import {
   acquireScreenWakeLock,
+  activateStreamingMediaSession,
   canAccessUserMedia,
+  clearStreamingMediaSession,
   createIceCandidateQueue,
   getRtcConfiguration,
   getUserMediaCompat,
   isMediaSecureContext,
   releaseScreenWakeLock,
+  watchBrowserMediaPermissions,
   wsUrl,
 } from './webrtc-helpers.js';
 import { initAppConfig } from './server-config.js';
@@ -58,6 +61,10 @@ function cleanup() {
   btnStart.disabled = false;
   btnStop.disabled = true;
   if (btnOpenSettings) btnOpenSettings.classList.add('hidden');
+  if (backgroundHintEl) backgroundHintEl.classList.add('hidden');
+  unwatchBrowserPermissions();
+  unwatchBrowserPermissions = () => {};
+  clearStreamingMediaSession();
   releaseScreenWakeLock();
   void stopStreamingForegroundService();
 }
@@ -213,6 +220,15 @@ btnStart.addEventListener('click', () => {
     .then((stream) => {
       localStream = stream;
       localPreview.srcObject = stream;
+      activateStreamingMediaSession();
+      unwatchBrowserPermissions();
+      unwatchBrowserPermissions = watchBrowserMediaPermissions((key, state) => {
+        if (state === 'denied' && localStream) {
+          setStatus(
+            `Browser ${key} permission was revoked. Stop sharing and start again after fixing site settings.`,
+          );
+        }
+      });
       void acquireScreenWakeLock();
       return localPreview.play().catch(() => {});
     })
@@ -233,7 +249,12 @@ if (btnOpenSettings) {
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'visible' || !localStream) return;
+  if (!localStream) return;
+  if (document.visibilityState === 'hidden') {
+    if (backgroundHintEl) backgroundHintEl.classList.remove('hidden');
+    return;
+  }
+  if (backgroundHintEl) backgroundHintEl.classList.add('hidden');
   void acquireScreenWakeLock();
   if (localPreview.srcObject) localPreview.play().catch(() => {});
 });

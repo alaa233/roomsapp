@@ -26,6 +26,10 @@
         </button>
       </div>
       <p id="status" class="status" role="status"></p>
+      <p id="backgroundHint" class="hint hint--background hidden" role="note">
+        Tab is in the background: your browser may pause or stop camera/microphone. Keep this tab
+        visible for the most reliable stream, or use the Capacitor child app on a device.
+      </p>
       <video id="localPreview" class="preview" playsinline muted autoplay></video>
     </main>
     <script type="module" src="/src/child.js"></script>

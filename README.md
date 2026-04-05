@@ -61,6 +61,10 @@ Then open [http://localhost:3000/parent.html](http://localhost:3000/parent.html)
 - Build web assets and sync native projects: `npm run build:mobile:sync`
 - MDM, signing, and `VITE_SERVER_URL` / managed `serverUrl`: see [ADMIN_MOBILE.md](ADMIN_MOBILE.md)
 
+## Web browser (child page)
+
+- The child UI uses the **Permissions API** (where supported) to detect camera/microphone revocation, **Media Session** so the OS may show media controls and treat playback as active, and **Screen Wake Lock** while the tab is visible. Browsers can still throttle or stop capture when the tab is in the background; the page shows a warning in that case. For longer “background” use, prefer the Capacitor app (foreground service on Android).
+
 ## STUN and TURN
 
 - **STUN** is enabled in [`src/webrtc-helpers.js`](src/webrtc-helpers.js).

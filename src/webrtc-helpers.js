@@ -147,3 +147,80 @@ export async function releaseScreenWakeLock() {
   }
   wakeLockSentinel = null;
 }
+
+/**
+ * Permissions API for camera/microphone (Chromium; Safari support varies).
+ * Returns latest known states: "granted" | "denied" | "prompt" or null if unsupported.
+ */
+export async function queryBrowserMediaPermissions() {
+  const out = { camera: null, microphone: null };
+  if (typeof navigator === 'undefined' || !navigator.permissions?.query) {
+    return out;
+  }
+  try {
+    const c = await navigator.permissions.query({ name: 'camera' });
+    out.camera = c.state;
+  } catch {
+    /* unsupported name */
+  }
+  try {
+    const m = await navigator.permissions.query({ name: 'microphone' });
+    out.microphone = m.state;
+  } catch {
+    /* unsupported name */
+  }
+  return out;
+}
+
+/**
+ * Subscribe to Permission API changes (e.g. user revokes in browser settings).
+ * Returns a no-op cleanup function if unsupported.
+ */
+export function watchBrowserMediaPermissions(onChange) {
+  if (typeof navigator === 'undefined' || !navigator.permissions?.query) {
+    return () => {};
+  }
+  const cleanups = [];
+  const attach = async (name, key) => {
+    try {
+      const p = await navigator.permissions.query({ name });
+      const handler = () => onChange(key, p.state);
+      p.addEventListener('change', handler);
+      cleanups.push(() => p.removeEventListener('change', handler));
+    } catch {
+      /* ignore */
+    }
+  };
+  void attach('camera', 'camera');
+  void attach('microphone', 'microphone');
+  return () => {
+    for (const fn of cleanups) fn();
+  };
+}
+
+/**
+ * Media Session: marks this page as active media playback so some browsers/OSes
+ * throttle the tab less and show a media control (best effort; not full background capture).
+ */
+export function activateStreamingMediaSession() {
+  if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'Child Monitor',
+      artist: 'Streaming to parent',
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  } catch {
+    /* policy or unsupported */
+  }
+}
+
+export function clearStreamingMediaSession() {
+  if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+  try {
+    navigator.mediaSession.metadata = null;
+    navigator.mediaSession.playbackState = 'none';
+  } catch {
+    /* ignore */
+  }
+}

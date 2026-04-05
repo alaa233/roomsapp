@@ -61,6 +61,13 @@ h1 {
   line-height: 1.45;
 }
 
+.hint--background {
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  color: #c9a227;
+}
+
 .field {
   display: flex;
   flex-direction: column;
