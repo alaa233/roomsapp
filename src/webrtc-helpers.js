@@ -28,10 +28,10 @@ export function canAccessUserMedia() {
 }
 
 /**
- * Never use `navigator.mediaDevices.getUserMedia` directly — on insecure pages
- * `mediaDevices` is missing and Safari throws when evaluating that expression.
+ * Returns the getUserMedia Promise directly (not an async wrapper) so iOS Safari
+ * can keep the call tied to the user tap — async click handlers can break that.
  */
-export async function getUserMediaCompat(constraints) {
+export function getUserMediaCompat(constraints) {
   const md = navigator.mediaDevices;
   if (md != null && typeof md.getUserMedia === 'function') {
     return md.getUserMedia(constraints);
@@ -45,13 +45,17 @@ export async function getUserMediaCompat(constraints) {
   }
 
   if (!isMediaSecureContext()) {
-    throw new Error(
-      'Use HTTPS or https://localhost (not plain http:// to a network address). Safari hides camera/mic until the page is secure.',
+    return Promise.reject(
+      new Error(
+        'Use HTTPS or https://localhost (not plain http:// to a network address). Safari hides camera/mic until the page is secure.',
+      ),
     );
   }
 
-  throw new Error(
-    'Camera/microphone are not available here. Open in Safari or Chrome, not inside another app’s browser.',
+  return Promise.reject(
+    new Error(
+      'Camera/microphone are not available here. Open in Safari or Chrome, not inside another app’s browser.',
+    ),
   );
 }
 

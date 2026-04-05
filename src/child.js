@@ -78,6 +78,46 @@ async function runNegotiation() {
   send({ type: 'offer', sdp: offer.sdp });
 }
 
+function formatGetUserMediaError(e) {
+  const name = e && e.name;
+  const msg = (e && e.message) || String(e);
+  if (name === 'NotAllowedError' || /not allowed/i.test(msg)) {
+    return (
+      'Camera/mic blocked. On iPhone: use Safari (not in-app browsers), tap Allow if asked. ' +
+      'Settings → Safari → scroll to Camera/Microphone for websites. Turn off Private Browsing and try again.'
+    );
+  }
+  return `Could not access camera/mic: ${msg}`;
+}
+
+function connectWebSocket(roomId) {
+  setStatus('Connecting to signaling…');
+  ws = new WebSocket(wsUrl());
+
+  ws.onopen = () => {
+    send({ type: 'join', roomId });
+    setStatus('Joined room. Waiting for parent…');
+    btnStop.disabled = false;
+  };
+
+  ws.onmessage = (ev) => {
+    let msg;
+    try {
+      msg = JSON.parse(ev.data);
+    } catch {
+      return;
+    }
+    onSignalMessage(msg);
+  };
+
+  ws.onclose = () => {
+    setStatus('Signaling disconnected.');
+    cleanup();
+  };
+
+  ws.onerror = () => setStatus('Signaling error.');
+}
+
 function onSignalMessage(msg) {
   if (msg.type === 'peer-joined') {
     if (localStream) runNegotiation().catch((e) => setStatus(String(e.message || e)));
@@ -115,7 +155,7 @@ function onSignalMessage(msg) {
   }
 }
 
-btnStart.addEventListener('click', async () => {
+btnStart.addEventListener('click', () => {
   const roomId = roomInput.value.trim();
   if (!roomId) {
     setStatus('Enter a room ID.');
@@ -139,41 +179,19 @@ btnStart.addEventListener('click', async () => {
   btnStart.disabled = true;
   setStatus('Requesting camera and microphone…');
 
-  try {
-    localStream = await getUserMediaCompat({ video: true, audio: true });
-    localPreview.srcObject = localStream;
-    await localPreview.play().catch(() => {});
-  } catch (e) {
-    setStatus(`Could not access camera/mic: ${e.message || e}`);
-    btnStart.disabled = false;
-    return;
-  }
-
-  setStatus('Connecting to signaling…');
-  ws = new WebSocket(wsUrl());
-
-  ws.onopen = () => {
-    send({ type: 'join', roomId });
-    setStatus('Joined room. Waiting for parent…');
-    btnStop.disabled = false;
-  };
-
-  ws.onmessage = (ev) => {
-    let msg;
-    try {
-      msg = JSON.parse(ev.data);
-    } catch {
-      return;
-    }
-    onSignalMessage(msg);
-  };
-
-  ws.onclose = () => {
-    setStatus('Signaling disconnected.');
-    cleanup();
-  };
-
-  ws.onerror = () => setStatus('Signaling error.');
+  getUserMediaCompat({ video: true, audio: true })
+    .then((stream) => {
+      localStream = stream;
+      localPreview.srcObject = stream;
+      return localPreview.play().catch(() => {});
+    })
+    .then(() => {
+      connectWebSocket(roomId);
+    })
+    .catch((e) => {
+      setStatus(formatGetUserMediaError(e));
+      btnStart.disabled = false;
+    });
 });
 
 btnStop.addEventListener('click', () => {
