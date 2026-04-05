@@ -1,6 +1,8 @@
 import {
+  acquireScreenWakeLock,
   createIceCandidateQueue,
   getRtcConfiguration,
+  releaseScreenWakeLock,
   wsUrl,
 } from './webrtc-helpers.js';
 
@@ -67,6 +69,7 @@ function cleanup() {
   updateChildMediaButtons();
   setChildMediaButtonsEnabled(false);
   setRemoteMediaControlsVisible(false);
+  releaseScreenWakeLock();
 }
 
 function send(msg) {
@@ -138,6 +141,7 @@ btnConnect.addEventListener('click', () => {
 
   btnConnect.disabled = true;
   setStatus('Connecting to signaling…');
+  void acquireScreenWakeLock();
 
   ws = new WebSocket(wsUrl());
 
@@ -185,4 +189,11 @@ btnChildCam?.addEventListener('click', () => {
   childCamOn = !childCamOn;
   updateChildMediaButtons();
   send({ type: 'child-video', enabled: childCamOn });
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !ws || ws.readyState !== WebSocket.OPEN)
+    return;
+  void acquireScreenWakeLock();
+  if (remoteVideo.srcObject) remoteVideo.play().catch(() => {});
 });

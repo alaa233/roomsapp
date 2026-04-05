@@ -1,9 +1,11 @@
 import {
+  acquireScreenWakeLock,
   canAccessUserMedia,
   createIceCandidateQueue,
   getRtcConfiguration,
   getUserMediaCompat,
   isMediaSecureContext,
+  releaseScreenWakeLock,
   wsUrl,
 } from './webrtc-helpers.js';
 
@@ -43,6 +45,7 @@ function cleanup() {
   }
   btnStart.disabled = false;
   btnStop.disabled = true;
+  releaseScreenWakeLock();
 }
 
 function send(msg) {
@@ -178,11 +181,13 @@ btnStart.addEventListener('click', () => {
 
   btnStart.disabled = true;
   setStatus('Requesting camera and microphone…');
+  void acquireScreenWakeLock();
 
   getUserMediaCompat({ video: true, audio: true })
     .then((stream) => {
       localStream = stream;
       localPreview.srcObject = stream;
+      void acquireScreenWakeLock();
       return localPreview.play().catch(() => {});
     })
     .then(() => {
@@ -192,6 +197,12 @@ btnStart.addEventListener('click', () => {
       setStatus(formatGetUserMediaError(e));
       btnStart.disabled = false;
     });
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !localStream) return;
+  void acquireScreenWakeLock();
+  if (localPreview.srcObject) localPreview.play().catch(() => {});
 });
 
 btnStop.addEventListener('click', () => {

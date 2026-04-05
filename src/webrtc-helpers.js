@@ -109,3 +109,29 @@ export function wsUrl() {
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${proto}//${location.host}/ws`;
 }
+
+/** Screen Wake Lock — keeps the display awake while streaming (needs Permissions-Policy screen-wake-lock). */
+let wakeLockSentinel = null;
+
+export async function acquireScreenWakeLock() {
+  if (typeof navigator === 'undefined' || !('wakeLock' in navigator)) return;
+  if (wakeLockSentinel) return;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null;
+    });
+  } catch {
+    /* not visible, low battery, or policy */
+  }
+}
+
+export async function releaseScreenWakeLock() {
+  if (!wakeLockSentinel) return;
+  try {
+    await wakeLockSentinel.release();
+  } catch {
+    /* already released */
+  }
+  wakeLockSentinel = null;
+}

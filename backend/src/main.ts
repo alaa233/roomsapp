@@ -5,7 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use((req: Request, res: Response, next: NextFunction) => {
-    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(self)');
+    res.setHeader(
+      'Permissions-Policy',
+      'camera=(self), microphone=(self), screen-wake-lock=(self)',
+    );
     next();
   });
   const port = Number(process.env.PORT) || 3000;
