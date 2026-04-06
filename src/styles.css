@@ -61,6 +61,15 @@ h1 {
   line-height: 1.45;
 }
 
+.hint--native {
+  margin-top: -0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(61, 154, 110, 0.35);
+  background: rgba(61, 154, 110, 0.08);
+  color: var(--text);
+}
+
 .hint--background {
   margin-top: -0.5rem;
   margin-bottom: 1rem;

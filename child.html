@@ -13,7 +13,10 @@
   <body class="page page--child">
     <main class="panel">
       <h1>Child device</h1>
-      <p class="hint">Enter the same room ID as the parent, then start. Allow camera and microphone when prompted.</p>
+      <p class="hint" id="browserHint">
+        Enter the same room ID as the parent, then start. Allow camera and microphone when prompted.
+      </p>
+      <p id="nativeAppHint" class="hint hint--native hidden" role="note"></p>
       <label class="field">
         <span>Room ID</span>
         <input id="roomId" type="text" autocomplete="off" placeholder="e.g. family-kitchen" />

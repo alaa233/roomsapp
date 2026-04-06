@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import {
   acquireScreenWakeLock,
   activateStreamingMediaSession,
@@ -23,12 +24,24 @@ import {
 
 await initAppConfig();
 
+const browserHintEl = document.getElementById('browserHint');
+const nativeAppHintEl = document.getElementById('nativeAppHint');
+if (Capacitor.isNativePlatform() && nativeAppHintEl) {
+  nativeAppHintEl.classList.remove('hidden');
+  nativeAppHintEl.textContent =
+    Capacitor.getPlatform() === 'android'
+      ? 'In this app, the device will ask for camera, microphone, and (Android 13+) notification permission so streaming can show a status notification. Then the camera preview may ask again for the in-app player — allow both.'
+      : 'In this app, the device will ask for camera and microphone in the system permission dialogs before streaming. Allow them to share with the parent.';
+  if (browserHintEl) browserHintEl.classList.add('hidden');
+}
+
 const roomInput = document.getElementById('roomId');
 const btnStart = document.getElementById('btnStart');
 const btnStop = document.getElementById('btnStop');
 const btnOpenSettings = document.getElementById('btnOpenSettings');
 const statusEl = document.getElementById('status');
 const localPreview = document.getElementById('localPreview');
+const backgroundHintEl = document.getElementById('backgroundHint');
 
 let ws = null;
 let localStream = null;
@@ -106,6 +119,11 @@ function formatGetUserMediaError(e) {
   const name = e && e.name;
   const msg = (e && e.message) || String(e);
   if (name === 'NotAllowedError' || /not allowed/i.test(msg)) {
+    if (Capacitor.isNativePlatform()) {
+      return (
+        'Camera or microphone was blocked for this app. Tap Open Settings, enable Camera and Microphone for this app, then try Start sharing again.'
+      );
+    }
     return (
       'Camera/mic blocked. On iPhone: use Safari (not in-app browsers), tap Allow if asked. ' +
       'Settings → Safari → scroll to Camera/Microphone for websites. Turn off Private Browsing and try again.'
@@ -205,7 +223,7 @@ btnStart.addEventListener('click', () => {
     const perm = await ensureStreamingPermissions();
     if (!perm.ok) {
       setStatus(
-        'Camera and microphone (and notifications on Android 13+) are required. Tap Open Settings if you denied them before.',
+        'This app needs camera and microphone in Settings (and notifications on Android 13+). Tap Open Settings to allow them, then try again.',
       );
       if (btnOpenSettings) btnOpenSettings.classList.remove('hidden');
       return;
